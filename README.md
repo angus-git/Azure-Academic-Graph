@@ -11,9 +11,27 @@ The Microsoft Academic Graph (MAG) is a heterogeneous graph containing scientifi
 
 ## Prerequisite
 
-### Azure Subscription
+### Azure Subscription ###
 
 Please create a new Azure subscription for the distribution previews. If your organization already using Azure, this could be a separate subscription under the same tenant id. If you start from scratch, for example “create Azure free account”, the subscription will be created under a new tenant id.
+
+### Microsoft Visual Studio Code ###
+
+Microsoft VS Code is required to run U-SQL scripts, please visit [here](https://code.visualstudio.com/download) to download Microsft VS Code.
+
+### Azure Data Lake Tools for Visual Studio Code ###
+
+**To install Azure Data Lake Tools**
+
+1. Open Visual Studio Code.
+2. Select **Extensions** in the left pane. Enter **Azure Data Lake Tools** in the search box.
+3. Select **Install** next to **Azure Data Lake Tools**. 
+
+   ![Selections for installing Data Lake Tools](https://docs.microsoft.com/en-us/azure/data-lake-analytics/media/data-lake-analytics-data-lake-tools-for-vscode/data-lake-tools-for-vscode-extensions.png)
+
+   After a few seconds, the **Install** button changes to **Reload**.
+4. Select **Reload** to activate the **Azure Data Lake Tools** extension.
+5. Select **Reload Window** to confirm. You can see **Azure Data Lake Tools** in the **Extensions** pane.
 
 ## Get Microsoft Academic Graph on Azure storage ##
 
