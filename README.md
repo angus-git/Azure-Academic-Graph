@@ -33,6 +33,10 @@ Microsoft VS Code is required to run U-SQL scripts, please visit [here](https://
 4. Select **Reload** to activate the **Azure Data Lake Tools** extension.
 5. Select **Reload Window** to confirm. You can see **Azure Data Lake Tools** in the **Extensions** pane.
 
+### Microsoft Power BI Desktop client ###
+
+Microsoft Power BI Desktop is required to config U-SQL scripts and Azure Storage to Power BI Template for making a visualization samples for Microsoft Academic Graph. please visit [here](https://www.microsoft.com/en-us/download/details.aspx?id=58494) to download Microsoft Power BI Desktop.
+
 ## Get Microsoft Academic Graph on Azure storage ##
 
 ### Create an Azure Storage Account ###
