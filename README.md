@@ -7,7 +7,7 @@ The Microsoft Academic Graph (MAG) is a heterogeneous graph containing scientifi
 1. Prerequisite
 2. Get Microsoft Academic Graph on Azure storage
 3. Sign up for MAG provisioning
-4. Recommended analytics options
+4. Set up Azure Data Lake Analytics (U-SQL) for Microsoft Academic Graph
 
 ## Prerequisite
 
@@ -43,7 +43,7 @@ Please create a new Azure subscription for the distribution previews. If your or
 
     ![Submit new storage account resource for creation](https://docs.microsoft.com/en-us/academic-services/graph/media/create-storage-account/submit.png "Submit new storage account resource for creation")
 
-### Note Azure storage account name and primary key
+### Note Azure storage account name and primary key ###
 
 1. Once notified that the storage account has been created, click “go to resource”
 
@@ -77,3 +77,35 @@ To sign up for MAG on AS distribution preview, send the following information us
 > **NOTE**
 >
 > MAG is currently in a free preview period, so there are no charges associated with the provisioning or use of the data/service itself. However Azure requires you to cover all costs associated with standard resource creation, usage, etc. For cost estimates associated with MAG please see the [Pricing](https://docs.microsoft.com/en-us/academic-services/graph/resources-pricing) page. <br/><br/>Most research institutions have an "Enterprise Account" with Microsoft including Azure subscription. The pricing for Enterprise Accounts differ from the individual account shown in Azure's price calculator. <br/><br/>If you have an Enterprise Account, please check with your individual institution's Information Technology/Computer Center resource on the process of setting up Azure to get MAG. You might need to obtain a "Master Agreement #" and involve MLSP (Microsoft Licensed Solution Provider) for help.
+
+## Set up Azure Data Lake Analytics (U-SQL) for Microsoft Academic Graph ##
+
+### Create Azure Data Lake Analytics account ###
+
+1. Home > Create a resource > Analytics > Data Lake Analytics
+
+    ![Create new Azure Data Lake Analytics account](https://docs.microsoft.com/en-us/academic-services/graph/media/create-analytics-account-select.png)
+
+1. Create new Data Lake Analytics and Data Lake Storage Gen1 accounts, following the flow indicated in figure below:
+
+    ![Enter details for new Azure Data Lake Analytics account](https://docs.microsoft.com/en-us/academic-services/graph/media/create-analytics-account-details.png)
+
+    > [!IMPORTANT]
+    > Both accounts require a globally unique name
+
+1. Make sure that you have these items of information:
+
+   * The name of your Azure Data Lake Analytics (ADLA) account
+
+   * The name of your Azure Data Lake Storage (ADLS) account
+
+### Configure Azure Data Lake Analytics to use Microsoft Academic Graph ###
+
+1. Navigate to the new Azure Data Lake Analytics account created in the first section and add a new data source:
+
+   ![Add new data source to analytics account](https://docs.microsoft.com/en-us/academic-services/graph/media/configure-analytics-account-datasource.png)
+
+1. On the "add data source" dialog, select storage type "azure storage", selection method "select account" and the Azure Storage (AS) account you created for MAG provisioning:
+
+   ![Select storage account created earlier](https://docs.microsoft.com/en-us/academic-services/graph/media/configure-analytics-account-select.png)
+
