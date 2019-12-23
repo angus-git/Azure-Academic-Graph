@@ -8,6 +8,7 @@ The Microsoft Academic Graph (MAG) is a heterogeneous graph containing scientifi
 2. Get Microsoft Academic Graph on Azure storage
 3. Sign up for MAG provisioning
 4. Set up Azure Data Lake Analytics (U-SQL) for Microsoft Academic Graph
+5. MAG for Organization Insight
 
 ## Prerequisite
 
@@ -131,3 +132,70 @@ To sign up for MAG on AS distribution preview, send the following information us
 
    ![Select storage account created earlier](https://docs.microsoft.com/en-us/academic-services/graph/media/configure-analytics-account-select.png)
 
+## MAG for Organization Insight ##
+
+### Gather the information that you need ###
+
+   Before you begin, you should have these items of information:
+
+   *  The name of your Azure Storage (AS) account containing MAG dataset 
+
+   *  The name of your Azure Data Lake Analytics (ADLA)
+
+   *  The name of your Azure Data Lake Storage (ADLS)
+
+   *  The name of the container in your Azure Storage (AS) account containing MAG dataset.
+
+### Create database from MAG data before running analytics examples ###
+
+In prerequisite Set up Azure Data Lake Analytics, you added the Azure Storage  (AS) created for MAG provision as a data source for the Azure Data Lake Analytics service (ADLA). In this section, you submit an ADLA job to create database from MAG data.
+
+1. In the [Azure portal](https://portal.azure.com), go to the Azure Data Lake Analytics (ADLA) service that you created, and select **Overview** > **New Job**.
+
+   ![Azure Data Lake Analytics - New job](https://docs.microsoft.com/en-us/academic-services/graph/media/samples-azure-data-lake-hindex/new-job.png "Azure Data Lake Analytics - New job")
+
+1. Copy code in samples/CreateDatabase.usql and paste into the code block.
+   
+1. Provide a **Job name** and select **Submit**.
+
+   ![Submit CreateFunctions job](https://docs.microsoft.com/en-us/academic-services/graph/media/samples-azure-data-lake-analytics/create-database-submit.png "Submit CreateDatabase job")
+
+1. The job should finish successfully.
+
+#### Running Example Analytics ####
+1. Download or clone the repository.
+2. Open the solution /src/AcademicAnalytics.sln
+3. For each tutorial there should be: A USQL script(.usql), a Power BI report(.pbix), a Power BI template(.pbit) and a README explaining the tutorial. 
+4. Althought each tutorial is different, running the USQL script as is and filling out the Power BI template using the same USQL parameters should give you a Power BI report with visualizations that match the Power BI report example included in the tutorial. Since the Microsoft Academic graph is contently improving, different graph verions may give you slightly different results.
+
+#### Working with USQL scripts ####
+- How to run
+    - Make sure you have selected your ADLA account
+
+
+    ![Select your ADLA Account in Visual Studio](https://github.com/Azure-Samples/academic-knowledge-analytics-visualization/raw/master/images/VSSelectADLAAccount.png)
+
+    - Build the script first to validate syntax
+
+
+    ![Build USQL script in Visual Studio](https://github.com/Azure-Samples/academic-knowledge-analytics-visualization/raw/master/images/VSBuildScript.png)
+
+    - Submit your script to your ADLA account
+
+
+    ![Submit USCQL script in Visual Studio](https://github.com/Azure-Samples/academic-knowledge-analytics-visualization/raw/master/images/VSSubmitScript.png)
+
+- How to view the results
+    - You can view the results via azure portal
+
+    
+    ![Azure Data lake Analyatics Data explorer](https://github.com/Azure-Samples/academic-knowledge-analytics-visualization/blob/master/images/ADLADataExplorer.png)
+    ![Azure Data lake Analyatics Data explorer2](https://github.com/Azure-Samples/academic-knowledge-analytics-visualization/raw/master/images/ADLADataExplorer2.png)
+
+
+#### Using Power BI ####
+- Make sure USQL script finished sucessfully
+- Open up corresponding Power BI Template(.pbit) from file explorer (Visual studio doesn't recognize Power BI files) 
+- Enter your ADL information and parameters corrisponding to your scripts
+![Sample template load](https://github.com/Azure-Samples/academic-knowledge-analytics-visualization/raw/master/images/PBITemplateInitParam.png)
+- Make sure the parameters cases are the same as your script and "click" to load
