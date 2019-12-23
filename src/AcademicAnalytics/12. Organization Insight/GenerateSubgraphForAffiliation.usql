@@ -1,0 +1,253 @@
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+//Make sure to run CreateDatabase script from common scripts first!
+USE DATABASE AcademicGraph;
+//*******************Input Variable Section********************************
+//        Change these variables for different calculations
+//*************************************************************************
+DECLARE @organizationName string = "microsoft";
+DECLARE @organizationPaperMinYear int = 1991;
+
+//*******************Constant Variable Section*****************************
+//        Defining const variables to be used by other parts of the script
+//*************************************************************************
+//This output path pattern is hardcoded to the pbi file. If this is changed, the pbi file needs to be modified as well
+DECLARE @outputBaseDir string = @"/output/dev/organizationInsight/" + Uri.EscapeUriString(@organizationName)+ "/";
+DECLARE @maDetailPagePrefix = @"https://academic.microsoft.com/#/detail/";
+
+//*************************Ouptut Section**********************************
+//                 All output files for this script.
+//*************************************************************************
+DECLARE @affiliationOutPath string = @outputBaseDir + "Affiliation.tsv";
+DECLARE @partnerAffiliationOutPath string = @outputBaseDir + "Partner_Affiliation.tsv";
+DECLARE @papersOutPath string = @outputBaseDir + "Paper.tsv";
+DECLARE @authorsOutPath string = @outputBaseDir + "Author.tsv";
+DECLARE @partnerAuthorsOutPath string = @outputBaseDir + "Partner_Author.tsv";
+DECLARE @paperAuthorAffiliationRelationshipOutPath string = @outputBaseDir + "PaperAuthorAffiliationRelationship.tsv";
+DECLARE @partnerPaperAuthorAffiliationRelationshipOutPath string = @outputBaseDir + "Partner_PaperAuthorAffiliationRelationship.tsv";
+DECLARE @venueOutPath string = @outputBaseDir + "Venue.tsv";
+DECLARE @paperFieldOfStudyOutPath string = @outputBaseDir + "PaperFieldOfStudyRelationship.tsv";
+DECLARE @fieldOfStudyOutPath string = @outputBaseDir + "FieldOfStudy.tsv";
+
+
+
+
+//Find the affiliation for the input organization
+@targetAffiliation =
+    SELECT 
+        AffiliationId, 
+        DisplayName AS AffiliationName
+    FROM Affiliations
+    WHERE NormalizedName == @organizationName;
+
+
+OUTPUT @targetAffiliation
+TO @affiliationOutPath
+USING Outputters.Tsv(outputHeader:true);
+
+
+@targetAffiliationId =
+    SELECT (long?) AffiliationId AS AffiliationId //Cast long to long? to join against Paper table
+    FROM @targetAffiliation;
+
+
+//Get all [Paper]->[Author]->[Affiliation(input organization] relationships
+@orgPaperAuthorAffiliation =
+    SELECT PaperAuthorAffiliations.PaperId,
+           PaperAuthorAffiliations.AuthorId,
+           @targetAffiliationId.AffiliationId,
+           PaperAuthorAffiliations.AuthorSequenceNumber
+    FROM PaperAuthorAffiliations
+         INNER JOIN
+             @targetAffiliationId
+         ON PaperAuthorAffiliations.AffiliationId == @targetAffiliationId.AffiliationId;
+
+
+OUTPUT @orgPaperAuthorAffiliation
+TO @paperAuthorAffiliationRelationshipOutPath
+USING Outputters.Tsv(outputHeader:true);
+
+
+//Get all org author Ids
+@orgAuthorIds =
+    SELECT DISTINCT AuthorId
+    FROM @orgPaperAuthorAffiliation;
+
+
+//Get all org author details
+@orgAuthors =
+    SELECT @orgAuthorIds.AuthorId,
+           Authors.DisplayName AS AuthorName
+    FROM Authors
+         INNER JOIN
+             @orgAuthorIds
+         ON Authors.AuthorId == @orgAuthorIds.AuthorId;
+
+
+OUTPUT @orgAuthors
+TO @authorsOutPath
+USING Outputters.Tsv(outputHeader:true);
+
+
+//Get all paper Ids for the input organization
+@orgPaperIds =
+    SELECT DISTINCT PaperId
+    FROM @orgPaperAuthorAffiliation;
+
+
+//Get all org paper details
+@orgPapers =
+    SELECT Papers.PaperId,
+           Papers.PaperTitle AS Title,
+           Papers.EstimatedCitation AS CitationCount,
+           Papers.Date,
+           //Use "Not avaliable" to represent the publication type if it is unknown.
+           String.IsNullOrEmpty(Papers.DocType) ? "Not avaliable" : Papers.DocType AS PublicationType,
+           Math.Exp(Papers.Rank * -0.001) AS LogProb,
+           @maDetailPagePrefix + Papers.PaperId AS Url,
+           Papers.ConferenceSeriesId == null ? Papers.JournalId : Papers.ConferenceSeriesId AS VId,
+           Year
+    FROM Papers
+         INNER JOIN
+             @orgPaperIds
+         ON Papers.PaperId == @orgPaperIds.PaperId
+    WHERE Year >= @organizationPaperMinYear;
+
+
+OUTPUT @orgPapers
+TO @papersOutPath
+USING Outputters.Tsv(outputHeader:true);
+
+
+//Get all [Paper]->[Author/Affiliation] relationships for the org
+@orgAllPaperAuthorAffiliations =
+    SELECT @orgPapers.PaperId,
+           PaperAuthorAffiliations.AuthorId,
+           PaperAuthorAffiliations.AffiliationId,
+           PaperAuthorAffiliations.AuthorSequenceNumber
+    FROM PaperAuthorAffiliations
+         JOIN
+             @orgPapers
+         ON PaperAuthorAffiliations.PaperId == @orgPapers.PaperId;
+
+
+//All distinct affiliation id from [Paper] -> [Author/Affiliation] relationship are the partner affiliations
+@orgPartnerPaperAuthorAffiliations =
+        SELECT 
+            PaperId,
+            AuthorId,
+            AffiliationId,
+            AuthorSequenceNumber
+        FROM @orgAllPaperAuthorAffiliations
+    EXCEPT
+//Don't include target org's affiliation in the distinct
+        SELECT 
+            PaperId,
+            AuthorId,
+            AffiliationId,
+            AuthorSequenceNumber
+        FROM @orgPaperAuthorAffiliation;
+
+
+OUTPUT @orgPartnerPaperAuthorAffiliations
+TO @partnerPaperAuthorAffiliationRelationshipOutPath
+USING Outputters.Tsv(outputHeader:true);
+
+
+//Get all partner orgs' affiliation Ids
+@orgPartnerAffiliationIds =
+    SELECT DISTINCT (long)AffiliationId AS AffiliationId
+    FROM @orgPartnerPaperAuthorAffiliations
+    WHERE AffiliationId != NULL;
+
+
+//Get all partner orgs' affiliation details
+@orgPartnerAffiliations =
+    SELECT @orgPartnerAffiliationIds.AffiliationId,
+           Affiliations.DisplayName AS AffiliationName
+    FROM Affiliations
+         INNER JOIN
+             @orgPartnerAffiliationIds
+         ON Affiliations.AffiliationId == @orgPartnerAffiliationIds.AffiliationId;
+
+
+OUTPUT @orgPartnerAffiliations
+TO @partnerAffiliationOutPath
+USING Outputters.Tsv(outputHeader:true);
+
+
+//Get all partner authors' Ids
+@orgPartnerAuthorIds =
+    SELECT DISTINCT AuthorId
+    FROM @orgPartnerPaperAuthorAffiliations;
+
+
+//Get all partner authors' details
+@orgPartnerAuthors =
+    SELECT @orgPartnerAuthorIds.AuthorId,
+           Authors.DisplayName AS AuthorName
+    FROM Authors
+         INNER JOIN
+             @orgPartnerAuthorIds
+         ON Authors.AuthorId == @orgPartnerAuthorIds.AuthorId;
+
+
+OUTPUT @orgPartnerAuthors
+TO @partnerAuthorsOutPath
+USING Outputters.Tsv(outputHeader:true);
+
+
+//Get all [Paper]->[Field of Study] relationships for the input organization
+@orgPaperFieldOfStudy =
+    SELECT @orgPapers.PaperId,
+           PaperFieldsOfStudy.FieldOfStudyId
+    FROM PaperFieldsOfStudy
+         INNER JOIN
+             @orgPapers
+         ON PaperFieldsOfStudy.PaperId == @orgPapers.PaperId;
+
+
+OUTPUT @orgPaperFieldOfStudy
+TO @paperFieldOfStudyOutPath
+USING Outputters.Tsv(outputHeader:true);
+
+
+//Get all Field of Study Ids for the input organization
+@orgFieldOfStudyIds =
+    SELECT DISTINCT FieldOfStudyId
+    FROM @orgPaperFieldOfStudy;
+
+
+//Get all fields of study details for the input organization
+@fieldOfStudyOut =
+    SELECT @orgFieldOfStudyIds.FieldOfStudyId,
+           FieldsOfStudy.Level AS FieldLevel,
+           FieldsOfStudy.DisplayName AS FieldName
+    FROM FieldsOfStudy
+         INNER JOIN
+             @orgFieldOfStudyIds
+         ON FieldsOfStudy.FieldOfStudyId == @orgFieldOfStudyIds.FieldOfStudyId;
+
+
+OUTPUT @fieldOfStudyOut
+TO @fieldOfStudyOutPath
+USING Outputters.Tsv(outputHeader:true);  
+
+
+//Get all Conference/Journal details as Venue details
+@venue =
+    SELECT ConferenceSeriesId AS VId,
+           DisplayName AS VenueName,
+           NormalizedName AS VenueShortName
+    FROM ConferenceSeries
+UNION
+    SELECT JournalId AS VId,
+           DisplayName AS VenueName,
+           NormalizedName AS VenueShortName
+    FROM Journals;
+
+
+OUTPUT @venue
+TO @venueOutPath
+USING Outputters.Tsv(outputHeader:true);   
