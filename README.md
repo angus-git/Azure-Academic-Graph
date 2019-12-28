@@ -154,7 +154,15 @@ In prerequisite Set up Azure Data Lake Analytics, you added the Azure Storage  (
 
    ![Azure Data Lake Analytics - New job](https://docs.microsoft.com/en-us/academic-services/graph/media/samples-azure-data-lake-hindex/new-job.png "Azure Data Lake Analytics - New job")
 
-1. Copy code in samples/CreateDatabase.usql and paste into the code block.
+1. To create a new job for creating database from MAG data, you need a Create Database USQL script. Please follow the steps below to get the CreateDatabase.usql script:
+
+   1. Open a new browser window, go to [Azure portal](https://portal.azure.com) and go to **Storage account**.
+
+   1. Go to your MAG stroage account and click **Containers**.
+
+   1. Go to samples and click CreateDatabase.usql, download the CreateDatabase.usql.
+
+1. Copy code in CreateDatabase.usql and paste into the code block.
    
 1. Provide a **Job name** and select **Submit**.
 
