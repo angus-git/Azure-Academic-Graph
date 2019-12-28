@@ -159,8 +159,11 @@ In prerequisite Set up Azure Data Lake Analytics, you added the Azure Storage  (
    1. Open a new browser window, go to [Azure portal](https://portal.azure.com) and go to **Storage account**.
 
    1. Go to your MAG stroage account and click **Containers**.
+   ![](./img/container.png)
 
    1. Go to samples and click CreateDatabase.usql, download the CreateDatabase.usql.
+   ![](./img/sample.png)
+   ![](./img/getCreateDatabase.png)
 
 1. Copy code in CreateDatabase.usql and paste into the code block.
    
