@@ -2,6 +2,10 @@
 
 The Microsoft Academic Graph (MAG) is a heterogeneous graph containing scientific publication records, citation relationships between those publications, as well as authors, institutions, journals, conferences, and fields of study. This graph is used to power experiences in Bing, Cortana, Word, and in Microsoft Academic. The graph is currently being updated on a weekly basis. 
 
+In this tutorial, you are able to create a organization insights with MAG and PowerBI like this.
+
+![](./img/bidemo.png) 
+
 ## Table of content ##
 
 1. Prerequisite
@@ -15,24 +19,6 @@ The Microsoft Academic Graph (MAG) is a heterogeneous graph containing scientifi
 ### Azure Subscription ###
 
 Please create a new Azure subscription for the distribution previews. If your organization already using Azure, this could be a separate subscription under the same tenant id. If you start from scratch, for example “create Azure free account”, the subscription will be created under a new tenant id.
-
-### Microsoft Visual Studio Code ###
-
-Microsoft VS Code is required to run U-SQL scripts, please visit [here](https://code.visualstudio.com/download) to download Microsft VS Code.
-
-### Azure Data Lake Tools for Visual Studio Code ###
-
-**To install Azure Data Lake Tools**
-
-1. Open Visual Studio Code.
-2. Select **Extensions** in the left pane. Enter **Azure Data Lake Tools** in the search box.
-3. Select **Install** next to **Azure Data Lake Tools**. 
-
-   ![Selections for installing Data Lake Tools](https://docs.microsoft.com/en-us/azure/data-lake-analytics/media/data-lake-analytics-data-lake-tools-for-vscode/data-lake-tools-for-vscode-extensions.png)
-
-   After a few seconds, the **Install** button changes to **Reload**.
-4. Select **Reload** to activate the **Azure Data Lake Tools** extension.
-5. Select **Reload Window** to confirm. You can see **Azure Data Lake Tools** in the **Extensions** pane.
 
 ### Microsoft Power BI Desktop client ###
 
@@ -173,40 +159,32 @@ In prerequisite Set up Azure Data Lake Analytics, you added the Azure Storage  (
 
 1. The job should finish successfully.
 
+
 #### Running Example Analytics ####
 1. Download or clone the repository.
-2. Open the solution /src/AcademicAnalytics.sln
-3. For each tutorial there should be: A USQL script(.usql), a Power BI report(.pbix), a Power BI template(.pbit) and a README explaining the tutorial. 
+2. Open the solution **/src/AcademicAnalytics/12. Organization Insight**
+3. The tutorial there should be: A USQL script(.usql), a Power BI report(.pbix), a Power BI template(.pbit) and a README explaining the tutorial. 
 4. Althought each tutorial is different, running the USQL script as is and filling out the Power BI template using the same USQL parameters should give you a Power BI report with visualizations that match the Power BI report example included in the tutorial. Since the Microsoft Academic graph is contently improving, different graph verions may give you slightly different results.
 
 #### Working with USQL scripts ####
-- How to run
-    - Make sure you have selected your ADLA account
+1. In the [Azure portal](https://portal.azure.com), go to the Azure Data Lake Analytics (ADLA) service that you created, and select **Overview** > **New Job**.
 
+   ![Azure Data Lake Analytics - New job](https://docs.microsoft.com/en-us/academic-services/graph/media/samples-azure-data-lake-hindex/new-job.png "Azure Data Lake Analytics - New job")
+   
+2. Open the GenerateSubgraphForAffiliation.usql script at **/src/AcademicAnalytics/12. Organization Insight**
 
-    ![Select your ADLA Account in Visual Studio](https://github.com/Azure-Samples/academic-knowledge-analytics-visualization/raw/master/images/VSSelectADLAAccount.png)
-
-    - Build the script first to validate syntax
-
-
-    ![Build USQL script in Visual Studio](https://github.com/Azure-Samples/academic-knowledge-analytics-visualization/raw/master/images/VSBuildScript.png)
-
-    - Submit your script to your ADLA account
-
-
-    ![Submit USCQL script in Visual Studio](https://github.com/Azure-Samples/academic-knowledge-analytics-visualization/raw/master/images/VSSubmitScript.png)
-
-- How to view the results
-    - You can view the results via azure portal
-
-    
-    ![Azure Data lake Analyatics Data explorer](https://github.com/Azure-Samples/academic-knowledge-analytics-visualization/blob/master/images/ADLADataExplorer.png)
-    ![Azure Data lake Analyatics Data explorer2](https://github.com/Azure-Samples/academic-knowledge-analytics-visualization/raw/master/images/ADLADataExplorer2.png)
-
+3. Copy code in GenerateSubgraphForAffiliation.usql and paste into the code block, and change the following parameters' value in the code:
+   1. @organizationName: The name of the organization
+      - All characters should be in small cases
+      - You may find the correct organization name here: https://academic.microsoft.com/home
+   2. @organizationPaperMinYear: The minimun year being searched from the organization
+   
+4. Provide a **Job name** and select **Submit**.
 
 #### Using Power BI ####
 - Make sure USQL script finished sucessfully
 - Open up corresponding Power BI Template(.pbit) from file explorer (Visual studio doesn't recognize Power BI files) 
 - Enter your ADL information and parameters corrisponding to your scripts
-![Sample template load](https://github.com/Azure-Samples/academic-knowledge-analytics-visualization/raw/master/images/PBITemplateInitParam.png)
-- Make sure the parameters cases are the same as your script and "click" to load
+![Sample template load](./img/biTemplate.png)
+    - The ADL URI can be found at the **Data Lake Storage Gen1** on Azure Portal
+- Make sure the parameters cases are the **same** as your script and "click" to load
