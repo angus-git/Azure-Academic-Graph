@@ -60,7 +60,7 @@ Microsoft Power BI Desktop is required to config U-SQL scripts and Azure Storage
 
 2. Go to “access keys” and take note of the “storage account name” and the “primary key”
 
-    ![Save new storage account resource name and access keys for later](https://docs.microsoft.com/en-us/academic-services/graph/media/create-storage-account/access-keys.png "Save new storage account resource name and access keys for later")
+    ![Save new storage account resource name and access keys for later](./img/accessKeys.jpg "Save new storage account resource name and access keys for later")
 
 3. Make sure that you have these items of information:
 
